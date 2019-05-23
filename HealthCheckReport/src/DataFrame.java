@@ -458,6 +458,218 @@ public class DataFrame extends javax.swing.JFrame {
         //
         if(database_type == "Microsoft SQL Server") {
             
+            
+            /**
+             * 
+             * Fetch Data on Others 
+             * 
+             */
+            
+            if(Others == 1) {
+            
+                try {
+                  // create our mysql database connection
+                  String myUrl = "jdbc:sqlserver://"+ip_address;
+                  Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+                  Connection conn = DriverManager.getConnection(myUrl, user, password);
+      
+
+                  String query = "USE "+database_name+";SELECT name As [DBName], database_id as [DBid],create_date as [DBcreated],state as [DBState], compatibility_level as [DBcomp]  FROM sys.databases where name = db_name()";
+                  Statement st = conn.createStatement();
+                  ResultSet rs = st.executeQuery(query);
+                  while (rs.next()) {
+                    String dname = rs.getString("DBName");
+                    String dcomp= rs.getString("DBcomp");
+                    Date ddate = rs.getDate("DBcreated");
+                    int did = rs.getInt("DBid");
+                    System.out.println(dname);
+                    System.out.println(dcomp);
+                    System.out.println(ddate);
+                    System.out.println(did);
+                    DatabaseID = String.valueOf(did);
+                    DbCreated = String.valueOf(ddate);
+                    DbCompatibility = dcomp;
+                  }
+                  st.close();
+                }
+                catch (Exception e) {
+                  System.err.println("Exception Occurred: At Getting Database Gereral Details from Database. ");
+                  System.err.println(e.getMessage());
+                }  
+            
+            
+            /**
+             * 
+             * MDF Size
+             */
+            
+            pgsFetching.setValue(20);
+            lblFetching.setText("Getting MDF File Size");
+            
+             try {
+                  // create our mysql database connection
+                  String myUrl = "jdbc:sqlserver://"+ip_address;
+                  Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+                  Connection conn = DriverManager.getConnection(myUrl, user, password);
+      
+
+                  String query = "USE "+database_name+";SELECT DB_NAME(database_id) AS DBName,Name AS Logical_Name, Physical_Name,(size*8)/1024 SizeMB FROM sys.master_files WHERE DB_NAME(database_id) = '"+database_name+"' and physical_name like '%mdf%'";
+                  Statement st = conn.createStatement();
+                  ResultSet rs = st.executeQuery(query);
+                  while (rs.next()) {
+                    int mdf = rs.getInt("SizeMB");
+                    //int did = rs.getInt("DBid");
+                    System.out.println(mdf);
+                    DbMDF = mdf;
+                  }
+                  st.close();
+                }
+                catch (Exception e) {
+                  System.err.println("Exception Occurred: At Getting Database Gereral Details from Database. ");
+                  System.err.println(e.getMessage());
+                }  
+             
+             /**
+             * 
+             * LDF Size
+             */
+             
+            pgsFetching.setValue(30);
+            lblFetching.setText("Getting LDF File Size");
+             
+             try {
+                  // create our mysql database connection
+                  String myUrl = "jdbc:sqlserver://"+ip_address;
+                  Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+                  Connection conn = DriverManager.getConnection(myUrl, user, password);
+      
+
+                  String query = "USE "+database_name+";SELECT DB_NAME(database_id) AS DBName,Name AS Logical_Name, Physical_Name,(size*8)/1024 SizeMB FROM sys.master_files WHERE DB_NAME(database_id) = '"+database_name+"' and physical_name like '%ldf%'";
+                  Statement st = conn.createStatement();
+                  ResultSet rs = st.executeQuery(query);
+                  while (rs.next()) {
+                    int ldf = rs.getInt("SizeMB");
+                    //int did = rs.getInt("DBid");
+                    System.out.println(ldf);
+                    DbLDF = ldf;
+                  }
+                  st.close();
+                }
+                catch (Exception e) {
+                  System.err.println("Exception Occurred: At Getting Database Gereral Details from Database. ");
+                  System.err.println(e.getMessage());
+                } 
+        
+            /**
+             * Getting Database Version Start
+             */
+             
+            pgsFetching.setValue(45);
+            lblFetching.setText("Getting Version Information");
+             
+            try {
+                  // create our mysql database connection
+                  String myUrl = "jdbc:sqlserver://"+ip_address;
+                  Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+                  Connection conn = DriverManager.getConnection(myUrl, user, password);
+      
+                  // our SQL SELECT query. 
+                  // if you only need a few columns, specify them by name instead of using "*"
+                  String query = "SELECT @@Version As [VERSION]";
+
+                  // create the java statement
+                  Statement st = conn.createStatement();
+      
+                  // execute the query, and get a java resultset
+                  ResultSet rs = st.executeQuery(query);
+      
+                  // iterate through the java resultset
+                  while (rs.next()) {
+                    //int id = rs.getInt("id");
+                    String database_version = rs.getString("VERSION");
+                    //String lastName = rs.getString("last_name");
+                    //Date dateCreated = rs.getDate("date_created");
+                    //boolean isAdmin = rs.getBoolean("is_admin");
+                    //int numPoints = rs.getInt("num_points");
+        
+                    // print the results
+                    //System.out.format("%s, %s, %s, %s, %s, %s\n", id, firstName, lastName, dateCreated, isAdmin, numPoints);
+                    System.out.println(database_version);
+                    DatabaseVersion = database_version;
+                  }
+                  st.close();
+                }
+                catch (Exception e) {
+                  System.err.println("Exception Occurred: At Getting Database Version from Database. ");
+                  System.err.println(e.getMessage());
+                }    
+            
+            /**
+             * 
+             * Database Owner
+             */
+            
+            try {
+                  // create our mysql database connection
+                  String myUrl = "jdbc:sqlserver://"+ip_address;
+                  Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+                  Connection conn = DriverManager.getConnection(myUrl, user, password);
+      
+
+                  String query = "USE "+database_name+";SELECT suser_sname( owner_sid ) As DBOwner FROM sys.databases where name = '"+database_name+"'";
+                  Statement st = conn.createStatement();
+                  ResultSet rs = st.executeQuery(query);
+                  while (rs.next()) {
+                    String owner = rs.getString("DBOwner");
+                    //int did = rs.getInt("DBid");
+                    System.out.println(owner);
+                    DBOwner = owner;
+                  }
+                  st.close();
+                }
+                catch (Exception e) {
+                  System.err.println("Exception Occurred: At Getting Database Gereral Details from Database. ");
+                  System.err.println(e.getMessage());
+                } 
+            
+            /**
+             * SELECT physical_name FROM sys.database_files where physical_name like '%mdf%'
+             * 
+             */
+            
+            try {
+                  // create our mysql database connection
+                  String myUrl = "jdbc:sqlserver://"+ip_address;
+                  Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+                  Connection conn = DriverManager.getConnection(myUrl, user, password);
+      
+
+                  String query = "USE "+database_name+";SELECT physical_name As Location FROM sys.database_files where physical_name like '%mdf%'";
+                  Statement st = conn.createStatement();
+                  ResultSet rs = st.executeQuery(query);
+                  while (rs.next()) {
+                    String dLoc = rs.getString("Location");
+                    //int did = rs.getInt("DBid");
+                    System.out.println(dLoc);
+                    DBLocation = dLoc;
+                  }
+                  st.close();
+                }
+                catch (Exception e) {
+                  System.err.println("Exception Occurred: At Getting Database Gereral Details from Database. ");
+                  System.err.println(e.getMessage());
+                } 
+            
+                
+            }
+            
+            
+            /**
+             * 
+             * Fetch Data on Unison
+             * 
+             */
+            
             if(Unison == 1) {
                    
             pgsFetching.setValue(10);

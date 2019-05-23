@@ -163,6 +163,16 @@ public class ResultsetFrame extends javax.swing.JFrame {
         if(Others == 1) {
             
             lblCurrentDate.setText(CurrentDate);
+            lblDBVersion.setText(DatabaseVersion);
+            lblDBID.setText(DatabaseID);
+            lblDBNAME.setText(database_name);
+            lblDBCreated.setText(DbCreated);
+            lblDBCompatible.setText(DbCompatibility);
+            lblMDF.setText(String.valueOf(DbMDF));
+            lblLDF.setText(String.valueOf(DbLDF));
+            lblDBOwner.setText(DBOwner);
+            lblCurrentDate.setText(CurrentDate);
+            lblDBLocation.setText(DBLocation);
             
         }
         
