@@ -11,10 +11,12 @@
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.ScrollPane;
+import java.io.File;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
@@ -28,7 +30,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-public class DataFrame extends javax.swing.JFrame {
+public class DataFrame extends javax.swing.JFrame implements Runnable {
 
     
     public static String ip_address;
@@ -49,6 +51,24 @@ public class DataFrame extends javax.swing.JFrame {
     public static int Others;
     public static int remember_me;
     //public static String[] query_selected = new String[50];
+    
+    //System Internal Variables
+    public static String windows_release;
+    public static String windows_service_pack_level;
+    public static int windows_sku;
+    public static int os_language_version;
+    public static String os_language_preferance;
+    public static String operating_system;
+    public static int processor_cores;
+    public static long free_memory;
+    public static long max_memory;
+    public static long total_memory_available_to_JVM;
+    public static String[] drive;
+    public static long[] drive_total_space;
+    public static long[] drive_free_space;
+    public static long[] drive_usable_space;
+    
+    
     public static String DatabaseVersion;
     public static String DatabaseID;
     public static String DBOwner;
@@ -94,6 +114,9 @@ public class DataFrame extends javax.swing.JFrame {
     public static int flagAverageSessionTimePerDay;
     public static String Unison_AverageSessionTimePerDay;
     
+    Component[] componentClear;
+    Component[] componentSelect;
+    
     
     /**
      * Creates new form DataFrame
@@ -103,7 +126,7 @@ public class DataFrame extends javax.swing.JFrame {
         System.out.println("Initiated DataFrame Form..");
         
         //Hiding Progress Bar and Label
-        pgsFetching.setVisible(false);
+        //pgsFetching.setVisible(false);
         lblFetching.setVisible(false);
         
         BeginForm form = new BeginForm();
@@ -145,6 +168,11 @@ public class DataFrame extends javax.swing.JFrame {
         //
         // Check Box Login 1 - Implementing Checkboxes on Selection Mode
         //
+        
+        /**
+         *  Others Block Start Here
+         */
+        
         if(Others == 1) {
         
         System.out.println("You Selected Others..");
@@ -170,120 +198,149 @@ public class DataFrame extends javax.swing.JFrame {
             
         }
         
+        /**
+         *  Others Block End Here
+         */
+        
+        /**
+         * Ambit Block Start Here
+         */
+        
         if(Ambit == 1) {
-  
-        System.out.println("You Selected Ambit..");
-        
-        try {
-           String myUrl = "jdbc:sqlserver://"+ip_address;
-           Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-           Connection conn = DriverManager.getConnection(myUrl, user, password);
-           String query = "USE "+database_name+";SELECT getdate() As [Current Date]";
-           Statement st = conn.createStatement();
-           ResultSet rs = st.executeQuery(query);
-           while (rs.next()) {
-              String date = rs.getString("Current Date");
-              System.out.println("Current Date:" + date);
-              CurrentDate = String.valueOf(date);
-           }
-           st.close();
+            
+            System.out.println("You Selected Ambit..");
+            
+            try {
+                
+                String myUrl = "jdbc:sqlserver://"+ip_address;
+                Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+                Connection conn = DriverManager.getConnection(myUrl, user, password);
+                String query = "USE "+database_name+";SELECT getdate() As [Current Date]";
+                Statement st = conn.createStatement();
+                ResultSet rs = st.executeQuery(query);
+                while (rs.next()) {
+                    
+                    String date = rs.getString("Current Date");
+                    System.out.println("Current Date:" + date);
+                    CurrentDate = String.valueOf(date);
+                }
+                st.close();
+            }
+            catch (Exception e) {
+                System.err.println("Got an exception! ");
+                System.err.println(e.getMessage());
+            }
+            
+            JCheckBox checkBox = new JCheckBox("Check me!");
+            JCheckBox checkBox2 = new JCheckBox("Hello World!");
+            //System.out.println(getFrames().toString());  
+            this.add(checkBox);
+            this.add(checkBox2);
+            this.revalidate();
+            this.repaint();
+            
         }
-        catch (Exception e) {
-           System.err.println("Got an exception! ");
-           System.err.println(e.getMessage());
-        } 
         
-        JCheckBox checkBox = new JCheckBox("Check me!");
-        JCheckBox checkBox2 = new JCheckBox("Hello World!");
-        //System.out.println(getFrames().toString());  
-        this.add(checkBox);
-        this.add(checkBox2);
-        this.revalidate();
-        this.repaint();
-        }
+        /**
+         * Ambit Block End Here
+         */
+        
+        /**
+         * ======================================================================================================
+         **/
+        
+        /**
+         * Unison Block Start Here
+         */
         
         //
         // IF Only Unison is selected.
         //
         if(Unison == 1) {
-        System.out.println("You Selected Unison..");
+            
+            System.out.println("You Selected Unison..");
         
-        //JScrollPane jScrollPane1 = new JScrollPane(pnlQueries);
+            //JScrollPane jScrollPane1 = new JScrollPane(pnlQueries);
         
+            chkTotalUser = new JCheckBox("Total Users", false);
+            chkTotalUser.setName("TotalUser");
+            chkTotalUser.setBounds(10, 10, 150, 20);
+            chkTotalUser.setFont(new java.awt.Font("Tahoma", 1, 14));
+            pnlQueries.add(chkTotalUser);
+            
+           //jScrollPane1.add(chkTotalUser);
         
-        chkTotalUser = new JCheckBox("Total Users", false);
-        chkTotalUser.setName("TotalUser");
-        chkTotalUser.setBounds(10, 10, 150, 20);
-        chkTotalUser.setFont(new java.awt.Font("Tahoma", 1, 14));
-        pnlQueries.add(chkTotalUser);
-        //jScrollPane1.add(chkTotalUser);
+            chkInactiveUser = new JCheckBox("Inactive Users", false);
+            chkInactiveUser.setBounds(250, 10, 150, 20);
+            chkInactiveUser.setFont(new java.awt.Font("Tahoma", 1, 14));
+            pnlQueries.add(chkInactiveUser);
         
-        chkInactiveUser = new JCheckBox("Inactive Users", false);
-        chkInactiveUser.setBounds(250, 10, 150, 20);
-        chkInactiveUser.setFont(new java.awt.Font("Tahoma", 1, 14));
-        pnlQueries.add(chkInactiveUser);
+            chkTotalUsersLoginPerDay = new JCheckBox("Total Users Login Per Day", false);
+            chkTotalUsersLoginPerDay.setBounds(450, 10, 250, 20);
+            chkTotalUsersLoginPerDay.setFont(new java.awt.Font("Tahoma", 1, 14));
+            pnlQueries.add(chkTotalUsersLoginPerDay);
         
-        chkTotalUsersLoginPerDay = new JCheckBox("Total Users Login Per Day", false);
-        chkTotalUsersLoginPerDay.setBounds(450, 10, 250, 20);
-        chkTotalUsersLoginPerDay.setFont(new java.awt.Font("Tahoma", 1, 14));
-        pnlQueries.add(chkTotalUsersLoginPerDay);
+            chkSessionEntryPerDay = new JCheckBox("Session Entry Per Day", false);
+            chkSessionEntryPerDay.setBounds(720, 10, 250, 20);
+            chkSessionEntryPerDay.setFont(new java.awt.Font("Tahoma", 1, 14));
+            pnlQueries.add(chkSessionEntryPerDay);
         
-        chkSessionEntryPerDay = new JCheckBox("Session Entry Per Day", false);
-        chkSessionEntryPerDay.setBounds(720, 10, 250, 20);
-        chkSessionEntryPerDay.setFont(new java.awt.Font("Tahoma", 1, 14));
-        pnlQueries.add(chkSessionEntryPerDay);
+            JCheckBox field5 = new JCheckBox("Session Activity Log Detail", false);
+            field5.setBounds(950, 10, 250, 20);
+            field5.setFont(new java.awt.Font("Tahoma", 1, 14));
+            pnlQueries.add(field5);
         
-        JCheckBox field5 = new JCheckBox("Session Activity Log Detail", false);
-        field5.setBounds(950, 10, 250, 20);
-        field5.setFont(new java.awt.Font("Tahoma", 1, 14));
-        pnlQueries.add(field5);
+            chkBranchesQuerterwise = new JCheckBox("Branches Querterwise", false);
+            chkBranchesQuerterwise.setBounds(10, 60, 250, 20);
+            chkBranchesQuerterwise.setFont(new java.awt.Font("Tahoma", 1, 14));
+            pnlQueries.add(chkBranchesQuerterwise);
         
-        chkBranchesQuerterwise = new JCheckBox("Branches Querterwise", false);
-        chkBranchesQuerterwise.setBounds(10, 60, 250, 20);
-        chkBranchesQuerterwise.setFont(new java.awt.Font("Tahoma", 1, 14));
-        pnlQueries.add(chkBranchesQuerterwise);
+            chkEformLogged = new JCheckBox("Eform Logged", false);
+            chkEformLogged.setBounds(250, 60, 250, 20);
+            chkEformLogged.setFont(new java.awt.Font("Tahoma", 1, 14));
+            pnlQueries.add(chkEformLogged);
         
-        chkEformLogged = new JCheckBox("Eform Logged", false);
-        chkEformLogged.setBounds(250, 60, 250, 20);
-        chkEformLogged.setFont(new java.awt.Font("Tahoma", 1, 14));
-        pnlQueries.add(chkEformLogged);
+            chkComplaintLogged = new JCheckBox("Complaint Logged", false);
+            chkComplaintLogged.setBounds(450, 60, 250, 20);
+            chkComplaintLogged.setFont(new java.awt.Font("Tahoma", 1, 14));
+            pnlQueries.add(chkComplaintLogged);
         
-        chkComplaintLogged = new JCheckBox("Complaint Logged", false);
-        chkComplaintLogged.setBounds(450, 60, 250, 20);
-        chkComplaintLogged.setFont(new java.awt.Font("Tahoma", 1, 14));
-        pnlQueries.add(chkComplaintLogged);
+            JCheckBox field9 = new JCheckBox("SEC Login History", false);
+            field9.setBounds(720, 60, 250, 20);
+            field9.setFont(new java.awt.Font("Tahoma", 1, 14));
+            pnlQueries.add(field9);
         
-        JCheckBox field9 = new JCheckBox("SEC Login History", false);
-        field9.setBounds(720, 60, 250, 20);
-        field9.setFont(new java.awt.Font("Tahoma", 1, 14));
-        pnlQueries.add(field9);
+            JCheckBox field10 = new JCheckBox("SEC Login History SLH", false);
+            field10.setBounds(950, 60, 250, 20);
+            field10.setFont(new java.awt.Font("Tahoma", 1, 14));
+            pnlQueries.add(field10);
         
-        JCheckBox field10 = new JCheckBox("SEC Login History SLH", false);
-        field10.setBounds(950, 60, 250, 20);
-        field10.setFont(new java.awt.Font("Tahoma", 1, 14));
-        pnlQueries.add(field10);
+            JCheckBox field11 = new JCheckBox("Session History", false);
+            field11.setBounds(10, 110, 250, 20);
+            field11.setFont(new java.awt.Font("Tahoma", 1, 14));
+            pnlQueries.add(field11);
         
-        JCheckBox field11 = new JCheckBox("Session History", false);
-        field11.setBounds(10, 110, 250, 20);
-        field11.setFont(new java.awt.Font("Tahoma", 1, 14));
-        pnlQueries.add(field11);
+            chkQuertzPerDay = new JCheckBox("Quertz Per Day", false);
+            chkQuertzPerDay.setBounds(250, 110, 250, 20);
+            chkQuertzPerDay.setFont(new java.awt.Font("Tahoma", 1, 14));
+            pnlQueries.add(chkQuertzPerDay);
         
-        chkQuertzPerDay = new JCheckBox("Quertz Per Day", false);
-        chkQuertzPerDay.setBounds(250, 110, 250, 20);
-        chkQuertzPerDay.setFont(new java.awt.Font("Tahoma", 1, 14));
-        pnlQueries.add(chkQuertzPerDay);
+            chkAverageSessionTimePerDay = new JCheckBox("Average Session Time Per Day", false);
+            chkAverageSessionTimePerDay.setBounds(450, 110, 250, 20);
+            chkAverageSessionTimePerDay.setFont(new java.awt.Font("Tahoma", 1, 14));
+            pnlQueries.add(chkAverageSessionTimePerDay);
         
-        chkAverageSessionTimePerDay = new JCheckBox("Average Session Time Per Day", false);
-        chkAverageSessionTimePerDay.setBounds(450, 110, 250, 20);
-        chkAverageSessionTimePerDay.setFont(new java.awt.Font("Tahoma", 1, 14));
-        pnlQueries.add(chkAverageSessionTimePerDay);
+            //pnlQueries.setBounds(100, 10, 100, 300);
         
-        //pnlQueries.setBounds(100, 10, 100, 300);
-        
-        pnlQueries.revalidate();
-        pnlQueries.repaint();
+            pnlQueries.revalidate();
+            pnlQueries.repaint();
         
         }
+        
+        /**
+         * Unison Block End Here
+         */
+        
         //End Logic 1
         
     }
@@ -302,8 +359,8 @@ public class DataFrame extends javax.swing.JFrame {
         jLabel16 = new javax.swing.JLabel();
         pnlQueries = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
+        btnSelectAll = new javax.swing.JButton();
+        btnClearAll = new javax.swing.JButton();
         pgsFetching = new javax.swing.JProgressBar();
         lblFetching = new javax.swing.JLabel();
 
@@ -345,7 +402,7 @@ public class DataFrame extends javax.swing.JFrame {
         );
         pnlQueriesLayout.setVerticalGroup(
             pnlQueriesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 145, Short.MAX_VALUE)
+            .addGap(0, 236, Short.MAX_VALUE)
         );
 
         jButton1.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
@@ -356,17 +413,17 @@ public class DataFrame extends javax.swing.JFrame {
             }
         });
 
-        jButton3.setText("Select All");
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
+        btnSelectAll.setText("Select All");
+        btnSelectAll.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
+                btnSelectAllActionPerformed(evt);
             }
         });
 
-        jButton2.setText("Clear All");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        btnClearAll.setText("Clear All");
+        btnClearAll.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                btnClearAllActionPerformed(evt);
             }
         });
 
@@ -390,28 +447,28 @@ public class DataFrame extends javax.swing.JFrame {
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButton3)
+                                .addComponent(btnSelectAll)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButton2)
+                                .addComponent(btnClearAll)
                                 .addGap(0, 0, Short.MAX_VALUE)))
                         .addContainerGap())
                     .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(jLabel16, javax.swing.GroupLayout.PREFERRED_SIZE, 1260, javax.swing.GroupLayout.PREFERRED_SIZE))))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jButton1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 273, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                            .addComponent(pgsFetching, javax.swing.GroupLayout.PREFERRED_SIZE, 176, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGap(49, 49, 49)))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(lblFetching)
-                        .addGap(92, 92, 92)))
-                .addGap(459, 459, 459))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(475, 475, 475)
+                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 273, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(528, 528, 528)
+                        .addComponent(pgsFetching, javax.swing.GroupLayout.PREFERRED_SIZE, 176, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(layout.createSequentialGroup()
+                .addGap(571, 571, 571)
+                .addComponent(lblFetching)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -419,20 +476,20 @@ public class DataFrame extends javax.swing.JFrame {
                 .addComponent(jLabel16, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jButton3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 65, Short.MAX_VALUE)
-                    .addComponent(jButton2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnSelectAll, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 65, Short.MAX_VALUE)
+                    .addComponent(btnClearAll, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jButton4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(pnlQueries, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(73, 73, 73)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 21, Short.MAX_VALUE)
                 .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(pgsFetching, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lblFetching)
-                .addContainerGap(126, Short.MAX_VALUE))
+                .addGap(87, 87, 87))
         );
 
         pack();
@@ -440,25 +497,1327 @@ public class DataFrame extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
-        //Loader Progess Bar and Progress Label
+        
+        //Loader Progess Bar and Progress Label Visibility Sets to True
         pgsFetching.setVisible(true);
         lblFetching.setVisible(true);
         
+        //Creating Instance of Previous Form to Get Information of user prompted fields.
         BeginForm form = new BeginForm();
+        
+        // Get IP Address Entered in Previous form
         ip_address = form.ip_address;
+        
+        // Get User Field Entered in Previous form
         user = form.user;
+        
+        // Get Password Field Entered in Previous form
         password = form.password;
+        
+        // Get Database Name Field Entered in Previous form
         database_name = form.database_name;
+        
+        // Get Database Vendor Field Entered in Previous form
         database_type = form.database_type;
+        
+        // Get Remember Me Field Entered in Previous form (Optional)
         remember_me = form.remember_me;
         
+        // Loader Progess Bar and Progress Label Current Status sets to 10.
         pgsFetching.setValue(10);
         lblFetching.setText("10%");
         
+        //System Information End
+        
         //
         if(database_type == "Microsoft SQL Server") {
-            
-            
+         
+        //System Information Start
+        
+        /**
+         * 
+         */
+        //processor_cores = Runtime.getRuntime().availableProcessors();
+        //System.out.println("Available processors (cores): " + processor_cores);
+        
+        /* Total amount of free memory available to the JVM */
+        //free_memory = Runtime.getRuntime().freeMemory();
+        //System.out.println("Free memory (bytes): " + free_memory);
+
+        /* This will return Long.MAX_VALUE if there is no preset limit */
+        //max_memory = Runtime.getRuntime().maxMemory();
+        /* Maximum amount of memory the JVM will attempt to use */
+        //System.out.println("Maximum memory (bytes): " + (max_memory == Long.MAX_VALUE ? "no limit" : max_memory));
+
+        /* Total memory currently available to the JVM */
+        //total_memory_available_to_JVM = Runtime.getRuntime().totalMemory();
+        //System.out.println("Total memory available to JVM (bytes): " + total_memory_available_to_JVM);
+
+        /* Get a list of all filesystem roots on this system */
+        //File[] roots = File.listRoots();
+        //drive = new String[roots.length];
+        //drive_total_space = new long[roots.length];
+        //drive_free_space = new long[roots.length];
+        //drive_usable_space = new long[roots.length];
+        //int localflag = 0;
+
+        /* For each filesystem root, print some info */
+        //for (File root : roots) {
+        //drive[localflag] = root.getAbsolutePath();
+        //drive_total_space[localflag] = root.getTotalSpace();
+        //drive_free_space[localflag] = root.getFreeSpace();
+        //drive_usable_space[localflag] = root.getUsableSpace();
+        //System.out.println("File system root: " + root.getAbsolutePath());
+        //System.out.println("Total space (bytes): " + root.getTotalSpace());
+        //System.out.println("Free space (bytes): " + root.getFreeSpace());
+        //System.out.println("Usable space (bytes): " + root.getUsableSpace());
+        //localflag = localflag+1;
+        //}
+        
+        /**
+         * New Code 101
+         */
+        
+        //SELECT * FROM sys.dm_os_windows_info;
+        
+        try {
+ 
+            // create our mysql database connection
+            String myUrl = "jdbc:sqlserver://"+ip_address;
+            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+            Connection conn = DriverManager.getConnection(myUrl, user, password);
+      
+
+            String query = "USE "+database_name+";SELECT * FROM sys.dm_os_windows_info";
+            Statement st = conn.createStatement();
+            ResultSet rs = st.executeQuery(query);
+            while (rs.next()) {
+                windows_release = rs.getString("windows_release");
+                windows_service_pack_level = rs.getString("windows_service_pack_level");
+                windows_sku = rs.getInt("windows_sku");
+                os_language_version = rs.getInt("os_language_version");
+                System.out.println("Windows Release" + windows_release);
+                System.out.println("Windows Service Pack Level" + windows_service_pack_level);
+                System.out.println("Windows SKU" + windows_sku);
+                System.out.println("O.S. Language Version" + os_language_version);
+            }
+            st.close();
+        }
+        catch (Exception e) {
+            System.err.println("Exception Occurred: At Getting Database Gereral Details from Database. ");
+            System.err.println(e.getMessage());
+        }
+        
+        switch(windows_release){
+            case "10.0*":
+                operating_system = "Windows Server 2016 ";
+                break;
+            case "6.3*":
+                operating_system = "Windows Server 2012 R2 ";
+                break;
+            case "6.2":
+                operating_system = "Windows Server 2012 ";
+                break;
+            case "6.1":
+                operating_system = "Windows Server 2008 R2 ";
+                break;
+            case "6.0":
+                operating_system = "Windows Server 2008 ";
+                break;
+            case "5.2":
+                operating_system = "Windows Server 2003 R2 ";
+                break;
+            case "5.1":
+                operating_system = "Windows XP ";
+                break;
+            case "5.0":
+                operating_system = "Windows 2000 ";
+                break;
+            default:
+                operating_system = "";
+        }
+        
+        switch(windows_sku){
+            case 0:
+                operating_system += "An unknown product";
+                break;
+            case 1:
+                operating_system += "Ultimate";
+                break;
+            case 2:
+                operating_system += "Home Basic";
+                break;   
+            case 3:
+                operating_system += "Home Premium";
+                break;    
+            case 4:
+                operating_system += "Enterprise";
+                break;
+            case 5:
+                operating_system += "Home Basic N";
+                break;    
+            case 6:
+                operating_system += "Business";
+                break;    
+            case 7:
+                operating_system += "Server Standard";
+                break;   
+            case 8:
+                operating_system += "Server Datacenter (full installation)";
+                break; 
+            case 9:
+                operating_system += "Windows Small Business Server";
+                break;
+            case 10:
+                operating_system += "Server Enterprise (full installation)";
+                break;
+            case 11:
+                operating_system += "Starter";
+                break;
+            case 12:
+                operating_system += "Server Datacenter (core installation)";
+                break;
+            case 13:
+                operating_system += "Server Standard (core installation)";
+                break;    
+            case 14:
+                operating_system += "Server Enterprise (core installation)";
+                break;
+            case 15:
+                operating_system += "Server Enterprise for Itanium-based Systems";
+                break;
+            case 16:
+                operating_system += "Business N";
+                break;
+            case 17:
+                operating_system += "Web Server (full installation)";
+                break;
+            case 18:
+                operating_system += "HPC Edition";
+                break;
+            case 19:
+                operating_system += "Windows Storage Server 2008 R2 Essentials";
+                break;    
+            case 20:
+                operating_system += "Storage Server Express";
+                break;    
+            case 21:
+                operating_system += "Storage Server Standard";
+                break;
+            case 22:
+                operating_system += "Storage Server Workgroup";
+                break;   
+            case 23:
+                operating_system += "Storage Server Enterprise";
+                break;    
+            case 24:
+                operating_system += "Windows Server 2008 for Windows Essential Server Solutions";
+                break;
+            case 25:
+                operating_system += "Small Business Server Premium";
+                break;    
+            case 26:
+                operating_system += "Home Premium N";
+                break;    
+            case 27:
+                operating_system += "Enterprise N";
+                break;   
+            case 28:
+                operating_system += "Ultimate N";
+                break; 
+            case 29:
+                operating_system += "Web Server (core installation)";
+                break;
+            case 30:
+                operating_system += "Windows Essential Business Server Management Server";
+                break;
+            case 31:
+                operating_system += "Windows Essential Business Server Security Server";
+                break;
+            case 32:
+                operating_system += "Windows Essential Business Server Messaging Server";
+                break;
+            case 33:
+                operating_system += "Server Foundation";
+                break;    
+            case 34:
+                operating_system += "Windows Home Server 2011";
+                break;
+            case 35:
+                operating_system += "Windows Server 2008 without Hyper-V for Windows Essential Server Solutions";
+                break;
+            case 36:
+                operating_system += "Server Standard without Hyper-V";
+                break;
+            case 37:
+                operating_system += "Server Datacenter without Hyper-V (full installation)";
+                break;
+            case 38:
+                operating_system += "Server Enterprise without Hyper-V (full installation)";
+                break;
+            case 39:
+                operating_system += "Server Datacenter without Hyper-V (core installation)";
+                break;    
+            case 40:
+                operating_system += "Server Standard without Hyper-V (core installation)";
+                break;    
+            case 41:
+                operating_system += "Server Enterprise without Hyper-V (core installation)";
+                break;
+            case 42:
+                operating_system += "Microsoft Hyper-V Server";
+                break;   
+            case 43:
+                operating_system += "Storage Server Express (core installation)";
+                break;    
+            case 44:
+                operating_system += "Storage Server Standard (core installation)";
+                break;
+            case 45:
+                operating_system += "Storage Server Workgroup (core installation)";
+                break;    
+            case 46:
+                operating_system += "Storage Server Enterprise (core installation)";
+                break;    
+            case 47:
+                operating_system += "Starter N";
+                break;   
+            case 48:
+                operating_system += "Professional";
+                break; 
+            case 49:
+                operating_system += "Professional N";
+                break;
+            case 50:
+                operating_system += "Windows Small Business Server 2011 Essentials";
+                break;
+            case 51:
+                operating_system += "Server For SB Solutions";
+                break;
+            case 52:
+                operating_system += "Server Solutions Premium";
+                break;
+            case 53:
+                operating_system += "Server Solutions Premium (core installation)";
+                break;    
+            case 54:
+                operating_system += "Server For SB Solutions EM";
+                break;
+            case 55:
+                operating_system += "Server For SB Solutions EM";
+                break;
+            case 56:
+                operating_system += "Windows MultiPoint Server";
+                break;
+            case 57:
+                operating_system += "";
+                break;
+            case 58:
+                operating_system += "";
+                break;
+            case 59:
+                operating_system += "Windows Essential Server Solution Management";
+                break;    
+            case 60:
+                operating_system += "Windows Essential Server Solution Additional";
+                break;    
+            case 61:
+                operating_system += "Windows Essential Server Solution Management SVC";
+                break;
+            case 62:
+                operating_system += "Windows Essential Server Solution Additional SVC";
+                break;   
+            case 63:
+                operating_system += "Small Business Server Premium (core installation)";
+                break;    
+            case 64:
+                operating_system += "Server Hyper Core V";
+                break;
+            case 65:
+                operating_system += "";
+                break;    
+            case 66:
+                operating_system += "Starter E";
+                break;    
+            case 67:
+                operating_system += "Home Basic E";
+                break;   
+            case 68:
+                operating_system += "Home Premium E";
+                break; 
+            case 69:
+                operating_system += "Professional E";
+                break;
+            case 70:
+                operating_system += "Enterprise E";
+                break;
+            case 71:
+                operating_system += "Ultimate E";
+                break;
+            case 72:
+                operating_system += "Server Enterprise (evaluation installation)";
+                break;
+            case 73:
+                operating_system += "";
+                break;    
+            case 74:
+                operating_system += "";
+                break;
+            case 75:
+                operating_system += "";
+                break;
+            case 76:
+                operating_system += "Windows MultiPoint Server Standard (full installation)";
+                break;
+            case 77:
+                operating_system += "Windows MultiPoint Server Premium (full installation)";
+                break;
+            case 78:
+                operating_system += "";
+                break;
+            case 79:
+                operating_system += "Server Standard (evaluation installation)";
+                break;    
+            case 80:
+                operating_system += "Server Datacenter (evaluation installation)";
+                break;    
+            case 81:
+                operating_system += "";
+                break;
+            case 82:
+                operating_system += "";
+                break;   
+            case 83:
+                operating_system += "";
+                break;    
+            case 84:
+                operating_system += "Enterprise N (evaluation installation)";
+                break;
+            case 85:
+                operating_system += "";
+                break;    
+            case 86:
+                operating_system += "";
+                break;    
+            case 87:
+                operating_system += "";
+                break;   
+            case 88:
+                operating_system += "";
+                break; 
+            case 89:
+                operating_system += "";
+                break;
+            case 90:
+                operating_system += "";
+                break;
+            case 91:
+                operating_system += "";
+                break;
+            case 92:
+                operating_system += "";
+                break;
+            case 93:
+                operating_system += "";
+                break;    
+            case 94:
+                operating_system += "";
+                break;
+            case 95:
+                operating_system += "Storage Server Workgroup (evaluation installation)";
+                break;
+            case 96:
+                operating_system += "Storage Server Standard (evaluation installation)";
+                break;
+            case 97:
+                operating_system += "";
+                break;
+            case 98:
+                operating_system += "Windows 8 N";
+                break;
+            case 99:
+                operating_system += "Windows 8 China";
+                break;    
+            case 100:
+                operating_system += "Windows 8 Single Language";
+                break; 
+            case 101:
+                operating_system += "Windows 8";
+                break;
+            case 102:
+                operating_system += "";
+                break;    
+            case 103:
+                operating_system += "Professional with Media Center";
+                break;
+            default:
+                operating_system += "Unknown SKU";
+        }
+        
+        try {
+        
+        String[] os_lang_hex = {"0x1000", "0x1000", "0x1000"
+, "0x1000"
+, "0x0036"
+, "0x1000"
+, "0x0436"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x001C"
+, "0x041C"
+, "0x1000"
+, "0x0084"
+, "0x0484"
+, "0x1000"
+, "0x1000"
+, "0x005E"
+, "0x045E"
+, "0x0001"
+, "0x1401"
+, "0x3C01"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x0c01"
+, "0x1000"
+, "0x0801"
+, "0x1000"
+, "0x2C01"
+, "0x3401"
+, "0x3001"
+, "0x1001"
+, "0x1000"
+, "0x1801"
+, "0x2001"
+, "0x1000"
+, "0x4001"
+, "0x0401"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x2801"
+, "0x1C01"
+, "0x3801"
+, "0x1000"
+, "0x2401"
+, "0x002B"
+, "0x042B"
+, "0x004D"
+, "0x044D"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x742C"
+, "0x082C"
+, "0x002C"
+, "0x782C"
+, "0x042C"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x0045"
+, "0x0845"
+, "0x0445"
+, "0x1000"
+, "0x1000"
+, "0x006D"
+, "0x046D"
+, "0x002D"
+, "0x042D"
+, "0x0023"
+, "0x0423"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x641A"
+, "0x201A"
+, "0x681A"
+, "0x781A"
+, "0x141A"
+, "0x007E"
+, "0x047E"
+, "0x0002"
+, "0x0402"
+, "0x0055"
+, "0x0455"
+, "0x0003"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x0403"
+, "0x1000"
+, "0x0092"
+, "0x7c92"
+, "0x0492"
+, "0x1000"
+, "0x005C"
+, "0x7c5C"
+, "0x045C"
+, "0x1000"
+, "0x1000"
+, "0x0004"
+, "0x7804"
+, "0x0804"
+, "0x1004"
+, "0x7C04"
+, "0x0C04"
+, "0x1404"
+, "0x0404"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x0083"
+, "0x0483"
+, "0x001A"
+, "0x041A"
+, "0x101A"
+, "0x0005"
+, "0x0405"
+, "0x0006"
+, "0x0406"
+, "0x1000"
+, "0x008C"
+, "0x048C"
+, "0x0065"
+, "0x0465"
+, "0x1000"
+, "0x1000"
+, "0x0013"
+, "0x1000"
+, "0x0813"
+, "0x1000"
+, "0x1000"
+, "0x0413"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x0C51"
+, "0x1000"
+, "0x1000"
+, "0x0009"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x0C09"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x2809"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1009"
+, "0x2409"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x3C09"
+, "0x4009"
+, "0x1809"
+, "0x1000"
+, "0x1000"
+, "0x2009"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x4409"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1409"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x3409"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x4809"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1C09"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x2c09"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x0809"
+, "0x0409"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x3009"
+, "0x1000"
+, "0x1000"
+, "0x0025"
+, "0x0425"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x0038"
+, "0x1000"
+, "0x0438"
+, "0x0064"
+, "0x0464"
+, "0x000B"
+, "0x040B"
+, "0x000C"
+, "0x1000"
+, "0x080C"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x2c0C"
+, "0x0c0C"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x240C"
+, "0x300C"
+, "0x1000"
+, "0x1000"
+, "0x040C"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x3c0C"
+, "0x140C"
+, "0x1000"
+, "0x340C"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x380C"
+, "0x1000"
+, "0x1000"
+, "0x180C"
+, "0x200C"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x280C"
+, "0x1000"
+, "0x100C"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x0062"
+, "0x0462"
+, "0x1000"
+, "0x1000"
+, "0x0067"
+, "0x7C67"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x0867"
+, "0x1000"
+, "0x0056"
+, "0x0456"
+, "0x1000"
+, "0x1000"
+, "0x0037"
+, "0x0437"
+, "0x0007"
+, "0x0C07"
+, "0x1000"
+, "0x0407"
+, "0x1000"
+, "0x1407"
+, "0x1007"
+, "0x0807"
+, "0x0008"
+, "0x1000"
+, "0x0408"
+, "0x006F"
+, "0x046F"
+, "0x0074"
+, "0x0474"
+, "0x0047"
+, "0x0447"
+, "0x1000"
+, "0x1000"
+, "0x0068"
+, "0x7C68"
+, "0x1000"
+, "0x1000"
+, "0x0468"
+, "0x0075"
+, "0x0475"
+, "0x000D"
+, "0x040D"
+, "0x0039"
+, "0x0439"
+, "0x000E"
+, "0x040E"
+, "0x000F"
+, "0x040F"
+, "0x0070"
+, "0x0470"
+, "0x0021"
+, "0x0421"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x005D"
+, "0x7C5D"
+, "0x085D"
+, "0x785D"
+, "0x045d"
+, "0x003C"
+, "0x083C"
+, "0x0010"
+, "0x0410"
+, "0x1000"
+, "0x0810"
+, "0x1000"
+, "0x0011"
+, "0x0411"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x004B"
+, "0x044B"
+, "0x0060"
+, "0x0460"
+, "0x1000"
+, "0x003F"
+, "0x043F"
+, "0x0053"
+, "0x0453"
+, "0x0086"
+, "0x0486"
+, "0x1000"
+, "0x1000"
+, "0x0087"
+, "0x0487"
+, "0x0041"
+, "0x0441"
+, "0x1000"
+, "0x1000"
+, "0x0057"
+, "0x0457"
+, "0x0012"
+, "0x0412"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x0040"
+, "0x0440"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x0054"
+, "0x0454"
+, "0x0026"
+, "0x0426"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x0027"
+, "0x0427"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x7C2E"
+, "0x082E"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x006E"
+, "0x046E"
+, "0x1000"
+, "0x1000"
+, "0x002F"
+, "0x042F"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x003E"
+, "0x083E"
+, "0x043E"
+, "0x004C"
+, "0x044C"
+, "0x003A"
+, "0x043A"
+, "0x1000"
+, "0x1000"
+, "0x0081"
+, "0x0481"
+, "0x007A"
+, "0x047A"
+, "0x004E"
+, "0x044E"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x007C"
+, "0x047C"
+, "0x0050"
+, "0x7850"
+, "0x0450"
+, "0x7C50"
+, "0x0850"
+, "0x0C50"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x0061"
+, "0x0861"
+, "0x0461"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x0014"
+, "0x7C14"
+, "0x0414"
+, "0x7814"
+, "0x0814"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x0082"
+, "0x0482"
+, "0x0048"
+, "0x0448"
+, "0x0072"
+, "0x0472"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x0063"
+, "0x0463"
+, "0x0029"
+, "0x1000"
+, "0x0429"
+, "0x0015"
+, "0x0415"
+, "0x0016"
+, "0x1000"
+, "0x0416"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x0816"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x05FE"
+, "0x0501"
+, "0x09FF"
+, "0x0046"
+, "0x7C46"
+, "0x0446"
+, "0x0846"
+, "0x006B"
+, "0x046B"
+, "0x086B"
+, "0x0C6B"
+, "0x1000"
+, "0x1000"
+, "0x0018"
+, "0x0818"
+, "0x0418"
+, "0x0017"
+, "0x0417"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x0019"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x0819"
+, "0x0419"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x0085"
+, "0x0485"
+, "0x1000"
+, "0x1000"
+, "0x703B"
+, "0x243B"
+, "0x7C3B"
+, "0x103B"
+, "0x143B"
+, "0x003B"
+, "0x0C3B"
+, "0x043B"
+, "0x083B"
+, "0x743B"
+, "0x203B"
+, "0x783B"
+, "0x183B"
+, "0x1C3B"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x004F"
+, "0x044F"
+, "0x0091"
+, "0x0491"
+, "0x1000"
+, "0x1000"
+, "0x6C1A"
+, "0x1C1A"
+, "0x301A"
+, "0x281A"
+, "0x0C1A"
+, "0x701A"
+, "0x7C1A"
+, "0x181A"
+, "0x2c1A"
+, "0x241A"
+, "0x081A"
+, "0x006C"
+, "0x046C"
+, "0x0032"
+, "0x0832"
+, "0x0432"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x0059"
+, "0x7C59"
+, "0x0859"
+, "0x005B"
+, "0x045B"
+, "0x001B"
+, "0x041B"
+, "0x0024"
+, "0x0424"
+, "0x1000"
+, "0x1000"
+, "0x0077"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x0477"
+, "0x0030"
+, "0x0430"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x000A"
+, "0x2C0A"
+, "0x1000"
+, "0x200A"
+, "0x400A"
+, "0x1000"
+, "0x340A"
+, "0x240A"
+, "0x140A"
+, "0x5c0A"
+, "0x1c0A"
+, "0x300A"
+, "0x440A"
+, "0x1000"
+, "0x100A"
+, "0x480A"
+, "0x580A"
+, "0x080A"
+, "0x4C0A"
+, "0x180A"
+, "0x3C0A"
+, "0x280A"
+, "0x1000"
+, "0x500A"
+, "0x040A"
+, "0x0c0A"
+, "0x540A"
+, "0x380A"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x001D"
+, "0x1000"
+, "0x081D"
+, "0x041D"
+, "0x005A"
+, "0x045A"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x0028"
+, "0x7C28"
+, "0x0428"
+, "0x005F"
+, "0x7C5F"
+, "0x085F"
+, "0x0049"
+, "0x0449"
+, "0x1000"
+, "0x1000"
+, "0x0849"
+, "0x1000"
+, "0x1000"
+, "0x0044"
+, "0x0444"
+, "0x004A"
+, "0x044A"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x001E"
+, "0x041E"
+, "0x0051"
+, "0x1000"
+, "0x0451"
+, "0x1000"
+, "0x1000"
+, "0x0073"
+, "0x0873"
+, "0x0473"
+, "0x1000"
+, "0x1000"
+, "0x0031"
+, "0x0431"
+, "0x001F"
+, "0x1000"
+, "0x041F"
+, "0x0042"
+, "0x0442"
+, "0x0022"
+, "0x0422"
+, "0x002E"
+, "0x042E"
+, "0x0020"
+, "0x0820"
+, "0x0420"
+, "0x0080"
+, "0x0480"
+, "0x1000"
+, "0x1000"
+, "0x7843"
+, "0x0843"
+, "0x0043"
+, "0x7C43"
+, "0x0443"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x0803"
+, "0x0033"
+, "0x0433"
+, "0x002A"
+, "0x042A"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x1000"
+, "0x0052"
+, "0x0452"
+, "0x1000"
+, "0x1000"
+, "0x0088"
+, "0x0488"
+, "0x0034"
+, "0x0434"
+, "0x1000"
+, "0x1000"
+, "0x0078"
+, "0x0478"
+, "0x006A"
+, "0x1000"
+, "0x046A"
+, "0x1000"
+, "0x1000"
+, "0x0035"
+, "0x0435"
+};
+        
+        System.out.println("-- Hex Length: " +os_lang_hex.length);
+        System.out.println("-- os_language_version: " +os_language_version);
+        /**
+         * 
+         */
+        /**
+         * 
+         */
+        int[] os_language_decimal = new int[830];
+        for(int i = 0; i < os_lang_hex.length + 1;i++){
+            os_language_decimal[i] = 0;
+        }
+        
+        
+        for(int i = 0; i < os_lang_hex.length;i++){
+            os_language_decimal[i] = hexadecimalToDecimal(os_lang_hex[i]);
+            if(os_language_version == os_language_decimal[i])
+               switch(os_language_version){
+               case 1033:
+                   os_language_preferance = "en-US";
+                   break;
+               case 4096:
+                   os_language_preferance = "en-PK";
+                   break;
+               default:
+                   os_language_preferance = "Unknown";
+               }
+            }
+        
+        }
+        
+        catch(Exception ex) {
+           System.out.println("Exception Occured: " +ex.getMessage());
+        }
+        
+        System.out.println("Operating System: " +operating_system);
+        System.out.println("Operating System Language Preferance: " +os_language_preferance);
+        
+        /**
+         * New Code 101 End
+         */
+
             /**
              * 
              * Fetch Data on Others 
@@ -1252,15 +2611,34 @@ public class DataFrame extends javax.swing.JFrame {
         new BeginForm().setVisible(true);
     }//GEN-LAST:event_jButton4ActionPerformed
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    private void btnClearAllActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearAllActionPerformed
         // TODO add your handling code here:
-        
-    }//GEN-LAST:event_jButton2ActionPerformed
+        componentClear = (Component[]) 
+                    pnlQueries.getComponents();
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        // TODO add your handling code here:
+            for (Component comp : componentClear) {
+
+                if (comp instanceof JCheckBox) {
+                    JCheckBox box = (JCheckBox) comp;
+                    box.setSelected(false);
+                }
+            } 
         
-    }//GEN-LAST:event_jButton3ActionPerformed
+    }//GEN-LAST:event_btnClearAllActionPerformed
+
+    private void btnSelectAllActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelectAllActionPerformed
+        // TODO add your handling code here:
+        componentSelect = (Component[]) 
+                    pnlQueries.getComponents();
+
+            for (Component comp : componentSelect) {
+
+                if (comp instanceof JCheckBox) {
+                    JCheckBox box = (JCheckBox) comp;
+                    box.setSelected(true);
+                }
+            }
+    }//GEN-LAST:event_btnSelectAllActionPerformed
 
     /**
      * @param args the command line arguments
@@ -1296,11 +2674,49 @@ public class DataFrame extends javax.swing.JFrame {
             }
         });
     }
+    
+    // Function to convert hexadecimal to decimal 
+    public static int hexadecimalToDecimal(String hexVal) 
+    {    
+        int len = hexVal.length(); 
+       
+        // Initializing base value to 1, i.e 16^0 
+        int base = 1; 
+       
+        int dec_val = 0; 
+       
+        // Extracting characters as digits from last character 
+        for (int i=len-1; i>=0; i--) 
+        {    
+            // if character lies in '0'-'9', converting  
+            // it to integral 0-9 by subtracting 48 from 
+            // ASCII value 
+            if (hexVal.charAt(i) >= '0' && hexVal.charAt(i) <= '9') 
+            { 
+                dec_val += (hexVal.charAt(i) - 48)*base; 
+                   
+                // incrementing base by power 
+                base = base * 16; 
+            } 
+   
+            // if character lies in 'A'-'F' , converting  
+            // it to integral 10 - 15 by subtracting 55  
+            // from ASCII value 
+            else if (hexVal.charAt(i) >= 'A' && hexVal.charAt(i) <= 'F') 
+            { 
+                dec_val += (hexVal.charAt(i) - 55)*base; 
+           
+                // incrementing base by power 
+                base = base*16; 
+            } 
+        } 
+        return dec_val; 
+    } 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnClearAll;
+    private javax.swing.JButton btnSelectAll;
     private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel16;
@@ -1308,4 +2724,9 @@ public class DataFrame extends javax.swing.JFrame {
     private javax.swing.JProgressBar pgsFetching;
     private javax.swing.JPanel pnlQueries;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void run() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }

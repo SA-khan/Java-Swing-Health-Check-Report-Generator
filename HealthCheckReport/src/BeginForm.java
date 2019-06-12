@@ -20,7 +20,7 @@ import javax.swing.JOptionPane;
  *
  * @author saad.ahmed
  */
-public class BeginForm extends javax.swing.JFrame {
+public class BeginForm extends javax.swing.JFrame implements Runnable {
     
     public static String ip_address;
     public static String user;
@@ -42,6 +42,7 @@ public class BeginForm extends javax.swing.JFrame {
     /**
      * Creates new form BeginForm
      */
+    
     public BeginForm() {
         initComponents();
         
@@ -425,9 +426,7 @@ public class BeginForm extends javax.swing.JFrame {
     
     private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoginActionPerformed
         // TODO add your handling code here:
-        Thread.yield();
         prgLoader.setVisible(true);
-        Thread.yield();
         ip_address = txtServer.getText().toString();
         user = txtUser.getText().toString();
         password = txtPassword.getText().toString();
@@ -498,80 +497,25 @@ public class BeginForm extends javax.swing.JFrame {
         else{
         remember_me = 0;
         }
-        
-        if(ip_address == "" || user == "" ||  password == "" || database_name == "" || database_type == "Select database type.."){
-             System.out.println("Fields are empty.");
-             JOptionPane.showMessageDialog(this, "Fields should not be empty.", "Access Denied", JOptionPane.ERROR_MESSAGE);
-        }
-        else {
-            if(database_type == "Microsoft SQL Server") {
-             Thread.yield();
-             String Url = "jdbc:sqlserver://"+ip_address+";DatabaseName=" + database_name + ";user=" + user + ";Password=" + password + "";
-              try {
-                Thread.yield();
+         
                 prgLoader.setValue(50);
                 jLabel9.setText("50%");
                 
-                   Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-                   System.out.println("Trying to connect");
-                   Thread.yield();
-                   prgLoader.setValue(75);
-                   jLabel9.setText("75%");
-                   Connection connection = DriverManager.getConnection(Url);
+                DatabaseConnection d = new DatabaseConnection(ip_address,user,password,database_name,database_type);
+                new Thread(d).start();
+                if(d.flag == true){
                    prgLoader.setValue(100);
                    jLabel9.setText("100%");
-                   System.out.println("Connection Established Successfully and the Database Name is "+database_name);
-                   System.out.println("===========================================================");
-                   System.out.println("= Server Name: "+ip_address + "                           ");
-                   System.out.println("= User: "+user + "                                        ");
-                   System.out.println("= Password: "+password + "                                ");
-                   System.out.println("= Database Name: "+database_name + "                      ");
-                   System.out.println("= Database Type: "+database_type + "                      ");
-                   System.out.println("= Selected Product Ambit: "+Ambit + "                     ");
-                   System.out.println("= Selected Product Ambit Corporate: "+Ambit_Corporate + " ");
-                   System.out.println("= Selected Product Mobile App: "+Mobile + "               ");
-                   System.out.println("= Selected Product Novus: "+Novus + "                     ");
-                   System.out.println("= Selected Product Nimbus: "+Nimbus + "                   ");
-                   System.out.println("= Selected Product ODS: "+ODS + "                         ");
-                   System.out.println("= Selected Product RDV: "+RDV + "                         ");
-                   System.out.println("= Selected Product Vision: "+Vision + "                   ");
-                   System.out.println("= Selected Product Unison: "+Unison + "                   ");
-                   System.out.println("= Selected Product Others: "+Others + "                   ");
-                   System.out.println("===========================================================");
-                   JOptionPane.showMessageDialog(this, "Server and Database is successfully connected.", "Alert", JOptionPane.INFORMATION_MESSAGE);
                    this.setVisible(false);
                    new DataFrame().setVisible(true);
                 }
-            
-                catch(Exception e) {
-                   System.out.println("Unable to connect to Database Server.");
-                   e.printStackTrace(); 
-                   JOptionPane.showMessageDialog(this, "The connection to the database is not established. Please contact network administrator."+e.getMessage(), "Access Denied", JOptionPane.ERROR_MESSAGE);
+                else {
+                   prgLoader.setValue(100);
+                   jLabel9.setText("100%");
+                   JOptionPane.showMessageDialog(this, "Error Occured.","Alert",JOptionPane.ERROR_MESSAGE);
                 }
-            }
-            
-            else if(database_type == "Oracle Server") {
-                JOptionPane.showMessageDialog(this, "Oracle.","Alert",JOptionPane.ERROR_MESSAGE);
-            }
-            
-            else if(database_type == "MySql Server") {
-                JOptionPane.showMessageDialog(this, "MySql.","Alert",JOptionPane.ERROR_MESSAGE);
-            }
-            else if(database_type == "MangoDB Server") {
-                JOptionPane.showMessageDialog(this, "MangoDB.","Alert",JOptionPane.ERROR_MESSAGE);
-            }
-            else if(database_type == "DB/2 Server") {
-                JOptionPane.showMessageDialog(this, "IBM DB/2 Source Code Not Found.","Alert",JOptionPane.ERROR_MESSAGE);
-            }
-            else if(database_type == "Redis Server") {
-                JOptionPane.showMessageDialog(this, "Redis.","Alert",JOptionPane.ERROR_MESSAGE);
-            }
-            else {
-                JOptionPane.showMessageDialog(this, "Unknow Database","Alert",JOptionPane.ERROR_MESSAGE);
-            }
-        }
-      
-         prgLoader.setVisible(false);
+                 prgLoader.setVisible(false);
+
     }//GEN-LAST:event_btnLoginActionPerformed
 
     private void btnPingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPingActionPerformed
@@ -793,4 +737,10 @@ public class BeginForm extends javax.swing.JFrame {
     private javax.swing.JTextField txtServer;
     private javax.swing.JTextField txtUser;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void run() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }
+
